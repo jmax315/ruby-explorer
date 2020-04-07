@@ -1,0 +1,5 @@
+#!/bin/env ruby
+
+require_relative "../src/ruby_explorer.rb"
+
+$the_app= RubyExplorer.new
