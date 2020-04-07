@@ -1,0 +1,2 @@
+class RubyExplorer
+end
