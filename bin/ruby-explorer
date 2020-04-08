@@ -1,8 +1,29 @@
 #!/bin/env ruby
 
-require_relative "../src/ruby_explorer.rb"
+require 'optparse'
 
-if ARGV.length == 1
-  $the_app= RubyExplorer.new
+require_relative '../src/ruby_explorer.rb'
+
+
+optparser= OptionParser.new do |opts|
+  opts.banner= "usage: ruby-explorer [options] project-directory"
+  opts.separator ""
+
+  opts.on("-h", "--help", "Show this message") do
+    $stderr.puts opts
+    exit false
+  end
 end
 
+optparser.parse!
+
+if ARGV.length != 1
+  $stderr.puts optparser
+  exit false
+end
+
+$the_app= RubyExplorer.new
+$the_app.target_directory= ARGV[0]
+$the_app.run
+
+exit true
