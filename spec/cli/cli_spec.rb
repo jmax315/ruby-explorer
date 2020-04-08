@@ -1,3 +1,8 @@
+def set_argv(new_value)
+  Object.__send__(:remove_const, :ARGV)
+  Object.const_set(:ARGV, new_value)
+end
+
 describe "The CLI" do
   describe "with no arguments" do
     before do
@@ -13,7 +18,7 @@ describe "The CLI" do
   describe "with a single non-option argument" do
     before do
       $the_app= nil
-      ARGV= ["not-an-option"]
+      set_argv(["not-an-option"])
       load("bin/ruby-explorer")
     end
 
