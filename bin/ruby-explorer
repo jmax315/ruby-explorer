@@ -2,4 +2,7 @@
 
 require_relative "../src/ruby_explorer.rb"
 
-$the_app= RubyExplorer.new
+if ARGV.length == 1
+  $the_app= RubyExplorer.new
+end
+

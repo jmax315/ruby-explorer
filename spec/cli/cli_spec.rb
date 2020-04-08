@@ -13,11 +13,11 @@ describe "The CLI" do
   describe "with a single non-option argument" do
     before do
       $the_app= nil
+      ARGV= ["not-an-option"]
       load("bin/ruby-explorer")
     end
 
     it "creates the app" do
-      skip
       expect($the_app).not_to be_nil
     end
   end
