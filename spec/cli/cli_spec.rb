@@ -18,6 +18,8 @@ describe "The CLI" do
     it "does not create the app" do
       expect($the_app).to be_nil
     end
+
+    it "prints a usage message to stderr"
   end
 
   describe "with a single argument" do
@@ -34,5 +36,15 @@ describe "The CLI" do
     it "does not create the app" do
       expect($the_app).to be_nil
     end
+  end
+
+  describe "with a short help option" do
+    let(:argv) { ["-h"] }
+
+    it "does not create the app" do
+      expect($the_app).to be_nil
+    end
+
+    it "prints a usage message to stderr"
   end
 end
