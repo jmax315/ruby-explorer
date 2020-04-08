@@ -4,11 +4,16 @@ def set_argv(new_value)
 end
 
 describe "The CLI" do
+  let(:argv) { [] }
+
+  before do
+    $the_app= nil
+    set_argv(argv)
+    load("bin/ruby-explorer")
+  end
+
   describe "with no arguments" do
-    before do
-      $the_app= nil
-      load("bin/ruby-explorer")
-    end
+    let(:argv) { [] }
 
     it "does not create the app" do
       expect($the_app).to be_nil
@@ -16,11 +21,7 @@ describe "The CLI" do
   end
 
   describe "with a single non-option argument" do
-    before do
-      $the_app= nil
-      set_argv(["not-an-option"])
-      load("bin/ruby-explorer")
-    end
+    let(:argv) { ["not-an-option"] }
 
     it "creates the app" do
       expect($the_app).not_to be_nil
