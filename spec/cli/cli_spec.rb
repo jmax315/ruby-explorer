@@ -20,11 +20,19 @@ describe "The CLI" do
     end
   end
 
-  describe "with a single non-option argument" do
+  describe "with a single argument" do
     let(:argv) { ["not-an-option"] }
 
     it "creates the app" do
       expect($the_app).not_to be_nil
+    end
+  end
+
+  describe "with more than one argument" do
+    let(:argv) { ["one-option", "another-option"] }
+
+    it "does not create the app" do
+      expect($the_app).to be_nil
     end
   end
 end
