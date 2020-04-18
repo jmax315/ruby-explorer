@@ -3,10 +3,12 @@ require './src/ruby_explorer'
 describe "RubyExplorer#run" do
   let(:app) { RubyExplorer.new }
   let(:target_directory) {"target_directory"}
+  let(:original_directory) {"original-directory"}
 
   before do
     allow(Dir).to receive(:chdir)
     allow(Process).to receive(:spawn)
+    allow(Dir).to receive(:getwd).and_return(original_directory)
 
     app.target_directory= target_directory
     app.run
@@ -17,6 +19,6 @@ describe "RubyExplorer#run" do
     expect(Process).to have_received(:spawn).with("/bin/bash",
                                                   "-l",
                                                   "-c",
-                                                  "ruby -r probe bin/rails").ordered
+                                                  "ruby -r #{original_directory}/src/probe.rb bin/rails").ordered
   end
 end
