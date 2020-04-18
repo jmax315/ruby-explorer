@@ -12,7 +12,7 @@ describe "RubyExplorer#run" do
     app.run
   end
 
-  it "spawns the probe inserter" do
+  it "spawns the target app" do
     expect(Dir).to have_received(:chdir).with(target_directory).ordered
     expect(Process).to have_received(:spawn).with("/bin/bash",
                                                   "-l",
