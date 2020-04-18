@@ -19,6 +19,6 @@ describe "RubyExplorer#run" do
     expect(Process).to have_received(:spawn).with("/bin/bash",
                                                   "-l",
                                                   "-c",
-                                                  "ruby -r #{original_directory}/src/probe.rb bin/rails").ordered
+                                                  "ruby -r #{original_directory}/src/probe.rb bin/rails server").ordered
   end
 end
