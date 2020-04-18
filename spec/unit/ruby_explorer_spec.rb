@@ -14,11 +14,23 @@ describe "RubyExplorer#run" do
     app.run
   end
 
+  it "changes to the the target directory" do
+    expect(Dir).to have_received(:chdir).with(target_directory)
+  end
+
   it "spawns the target app" do
-    expect(Dir).to have_received(:chdir).with(target_directory).ordered
-    expect(Process).to have_received(:spawn).with("/bin/bash",
-                                                  "-l",
-                                                  "-c",
-                                                  "ruby -r #{original_directory}/src/probe.rb bin/rails server").ordered
+    expected_ruby_command=
+      "ruby -r #{original_directory}/src/probe.rb bin/rails server"
+
+    expect(Process).to have_received(:spawn).
+                         with("/bin/bash",
+                              "-l",
+                              "-c",
+                              expected_ruby_command)
+  end
+
+  it "changes directories before trying to spawn" do
+    expect(Dir).to have_received(:chdir).ordered
+    expect(Process).to have_received(:spawn).ordered
   end
 end
