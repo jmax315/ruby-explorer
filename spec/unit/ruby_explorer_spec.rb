@@ -29,7 +29,7 @@ describe "RubyExplorer#run" do
 
   it "spawns the target app" do
     expected_ruby_command=
-      "ruby -r #{absolute_src_directory}/probe.rb bin/rails server"
+      "ruby -r #{absolute_src_directory}/probe_loader.rb bin/rails server"
 
     expect(Process).to have_received(:spawn).
                          with("/bin/bash",
