@@ -1,9 +1,12 @@
+require 'pathname'
+
 class RubyExplorer
   attr_accessor :target_directory
 
   def run
-    original_directory= Dir.getwd
+    bin_directory= Pathname.new($0).dirname
+    src_directory= File.expand_path("#{bin_directory}/../src")
     Dir.chdir(target_directory)
-    Process.spawn("/bin/bash", "-l", "-c", "ruby -r #{original_directory}/src/probe.rb bin/rails server")
+    Process.spawn("/bin/bash", "-l", "-c", "ruby -r #{src_directory}/probe.rb bin/rails server")
   end
 end
