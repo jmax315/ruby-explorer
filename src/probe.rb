@@ -1,4 +1,4 @@
 class Probe
+  def install
+  end
 end
-
-puts "Hello from the probe!"
