@@ -13,5 +13,13 @@ describe "Probe" do
     it "wraps require" do
       expect(the_probe).to have_received(:wrap).with(Kernel, :require)
     end
+
+    it "wraps require_relative" do
+      expect(the_probe).to have_received(:wrap).with(Kernel, :require_relative)
+    end
+
+    it "wraps load" do
+      expect(the_probe).to have_received(:wrap).with(Kernel, :load)
+    end
   end
 end
