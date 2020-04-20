@@ -56,4 +56,32 @@ describe "Probe" do
       expect(wrap_target.a_method_called).to be(true)
     end
   end
+
+  describe "#wrap_class_method" do
+    class WrapTarget
+      @@a_class_method_called= false
+
+      def self.a_method
+        @@a_class_method_called= true
+      end
+    end
+
+    before do
+      @got_called_back= false
+      the_probe.wrap_class_method(WrapTarget, :a_method) do |original_method|
+        @got_called_back= true
+        original_method.call
+      end
+
+      WrapTarget.a_method
+    end
+
+    it "calls the wrap block back" do
+      expect(@got_called_back).to be(true)
+    end
+
+    it "calls the original method" do
+      expect(WrapTarget.class_variable_get(:@@a_class_method_called)).to be(true)
+    end
+  end
 end

@@ -11,4 +11,11 @@ class Probe
       yield(original_method.bind(self))
     end
   end
+
+  def wrap_class_method(klass, method_id)
+    original_method= klass.method(method_id)
+    klass.singleton_class.define_method(method_id) do
+      yield(original_method)
+    end
+  end
 end
