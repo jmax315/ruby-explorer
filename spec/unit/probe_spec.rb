@@ -25,14 +25,14 @@ describe "Probe" do
 
   describe "#wrap" do
     class WrapTarget
-      attr_accessor :a_method_called
+      attr_accessor :arg_passed
 
       def initialize
-        @a_method_called= false
+        @arg_passed= nil
       end
 
-      def a_method
-        @a_method_called= true
+      def a_method(an_arg)
+        @arg_passed= an_arg
       end
     end
 
@@ -40,12 +40,12 @@ describe "Probe" do
 
     before do
       @got_called_back= false
-      the_probe.wrap(WrapTarget, :a_method) do |original_method|
+      the_probe.wrap(WrapTarget, :a_method) do |original_method, args|
         @got_called_back= true
-        original_method.call
+        original_method.call(*args)
       end
 
-      wrap_target.a_method
+      wrap_target.a_method("passed argument")
     end
 
     it "calls the wrap block back" do
@@ -53,65 +53,64 @@ describe "Probe" do
     end
 
     it "calls the original method" do
-      expect(wrap_target.a_method_called).to be(true)
+      expect(wrap_target.arg_passed).to eq("passed argument")
     end
   end
 
   describe "#wrap_class_method" do
     describe "with a class method" do
-
       class WrapTarget
-        @@a_class_method_called= false
+        @@arg_passed= nil
 
-        def self.a_class_method
-          @@a_class_method_called= true
+        def self.a_class_method(an_arg)
+          @@arg_passed= an_arg
         end
       end
 
       before do
         @got_called_back= false
-        the_probe.wrap_class_method(WrapTarget, :a_class_method) do |original_method|
+        the_probe.wrap_class_method(WrapTarget, :a_class_method) do |original_method, args|
           @got_called_back= true
-          original_method.call
+          original_method.call(*args)
         end
 
-        WrapTarget.a_class_method
+        WrapTarget.a_class_method("passed argument")
       end
 
       it "calls the wrap block back" do
         expect(@got_called_back).to be(true)
       end
 
-      it "calls the original method" do
-        expect(WrapTarget.class_variable_get(:@@a_class_method_called)).to be(true)
+      it "calls the original method with the original arguments" do
+        expect(WrapTarget.class_variable_get(:@@arg_passed)).to eq("passed argument")
       end
     end
 
     describe "with a module method" do
       module ModuleToWrap
-        @@a_module_method_called= false
+        @@arg_passed= nil
 
-        def self.a_module_method
-          @@a_module_method_called= true
+        def self.a_module_method(an_arg)
+          @@arg_passed= an_arg
         end
       end
 
       before do
         @got_called_back= false
-        the_probe.wrap_class_method(ModuleToWrap, :a_module_method) do |original_method|
+        the_probe.wrap_class_method(ModuleToWrap, :a_module_method) do |original_method, args|
           @got_called_back= true
-          original_method.call
+          original_method.call(*args)
         end
 
-        ModuleToWrap.a_module_method
+        ModuleToWrap.a_module_method("passed argument")
       end
 
       it "calls the wrap block back" do
         expect(@got_called_back).to be(true)
       end
 
-      it "calls the original method" do
-        expect(ModuleToWrap.class_variable_get(:@@a_module_method_called)).to be(true)
+      it "calls the original method with the original arguments" do
+        expect(ModuleToWrap.class_variable_get(:@@arg_passed)).to eq("passed argument")
       end
     end
   end
