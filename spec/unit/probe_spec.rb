@@ -58,30 +58,61 @@ describe "Probe" do
   end
 
   describe "#wrap_class_method" do
-    class WrapTarget
-      @@a_class_method_called= false
+    describe "with a class method" do
 
-      def self.a_method
-        @@a_class_method_called= true
+      class WrapTarget
+        @@a_class_method_called= false
+
+        def self.a_class_method
+          @@a_class_method_called= true
+        end
+      end
+
+      before do
+        @got_called_back= false
+        the_probe.wrap_class_method(WrapTarget, :a_class_method) do |original_method|
+          @got_called_back= true
+          original_method.call
+        end
+
+        WrapTarget.a_class_method
+      end
+
+      it "calls the wrap block back" do
+        expect(@got_called_back).to be(true)
+      end
+
+      it "calls the original method" do
+        expect(WrapTarget.class_variable_get(:@@a_class_method_called)).to be(true)
       end
     end
 
-    before do
-      @got_called_back= false
-      the_probe.wrap_class_method(WrapTarget, :a_method) do |original_method|
-        @got_called_back= true
-        original_method.call
+    describe "with a module method" do
+      module ModuleToWrap
+        @@a_module_method_called= false
+
+        def self.a_module_method
+          @@a_module_method_called= true
+        end
       end
 
-      WrapTarget.a_method
-    end
+      before do
+        @got_called_back= false
+        the_probe.wrap_class_method(ModuleToWrap, :a_module_method) do |original_method|
+          @got_called_back= true
+          original_method.call
+        end
 
-    it "calls the wrap block back" do
-      expect(@got_called_back).to be(true)
-    end
+        ModuleToWrap.a_module_method
+      end
 
-    it "calls the original method" do
-      expect(WrapTarget.class_variable_get(:@@a_class_method_called)).to be(true)
+      it "calls the wrap block back" do
+        expect(@got_called_back).to be(true)
+      end
+
+      it "calls the original method" do
+        expect(ModuleToWrap.class_variable_get(:@@a_module_method_called)).to be(true)
+      end
     end
   end
 end
