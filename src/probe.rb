@@ -1,8 +1,25 @@
 class Probe
   def install
-    wrap(Kernel, :require)
-    wrap(Kernel, :require_relative)
-    wrap(Kernel, :load)
+    wrap(Kernel, :require) do |original_require, args|
+      puts "require(#{args})"
+      return_value= original_require.call(*args)
+      puts "require(#{args}): returned #{return_value}"
+      return_value
+    end
+
+    wrap(Kernel, :require_relative) do |original_require_relative, args|
+      puts "require_relative(#{args})"
+      return_value= original_require_relative.call(*args)
+      puts "require_relative(#{args}): returned #{return_value}"
+      return_value
+    end
+
+    wrap(Kernel, :load) do |original_load, args|
+      puts "load(#{args})"
+      return_value= original_load.call(*args)
+      puts "load(#{args}): returned #{return_value}"
+      return_value
+    end
   end
 
   def wrap(klass, method_id)

@@ -35,6 +35,7 @@ describe "Probe" do
       def a_method(arg)
         @a_method_called= true
         @arg_value= arg
+        return "a_method expected return value"
       end
     end
 
@@ -61,6 +62,10 @@ describe "Probe" do
     it "passes the arg value through" do
       expect(wrap_target.arg_value).to eq("expected arg value")
     end
+
+    it "returns the original return value" do
+      expect(wrap_target.a_method("")).to eq("a_method expected return value")
+    end
   end
 
   describe "#wrap_class_method" do
@@ -68,20 +73,21 @@ describe "Probe" do
       @@a_class_method_called= false
       @@arg_value= nil
 
-      def self.a_method(arg)
+      def self.a_class_method(arg)
         @@a_class_method_called= true
         @@arg_value= arg
+        return "a_class_method expected return value"
       end
     end
 
     before do
       @got_called_back= false
-      the_probe.wrap_class_method(WrapClassMethodTarget, :a_method) do |original_method, args|
+      the_probe.wrap_class_method(WrapClassMethodTarget, :a_class_method) do |original_method, args|
         @got_called_back= true
         original_method.call(*args)
       end
 
-      WrapClassMethodTarget.a_method("expected arg value")
+      WrapClassMethodTarget.a_class_method("expected arg value")
     end
 
     it "calls the wrap block back" do
@@ -95,6 +101,10 @@ describe "Probe" do
     it "passes the arg value through" do
       expect(WrapClassMethodTarget.class_variable_get(:@@arg_value)).to eq("expected arg value")
     end
+
+    it "returns the original return value" do
+      expect(WrapClassMethodTarget.a_class_method("")).to eq("a_class_method expected return value")
+    end
   end
 
   describe "#wrap on a module method" do
@@ -102,6 +112,7 @@ describe "Probe" do
       def a_module_method(arg)
         @a_module_method_called= true
         @arg_value= arg
+        return "a_module_method expected return value"
       end
     end
 
@@ -138,6 +149,10 @@ describe "Probe" do
 
     it "passes the arg value through" do
       expect(wrap_target.arg_value).to eq("expected arg value")
+    end
+
+    it "returns the original return value" do
+      expect(wrap_target.a_module_method("")).to eq("a_module_method expected return value")
     end
   end
 end
