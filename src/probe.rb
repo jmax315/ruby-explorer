@@ -8,12 +8,15 @@ class Probe
     end
 
     wrap(Kernel, :require_relative) do |original_require_relative, args|
-      # DEBUG
-      puts caller
-
       puts "require_relative(#{args})"
-      return_value= original_require_relative.call(*args)
-      puts "require_relative(#{args}): returned #{return_value}"
+
+      caller_path= caller(2,1).first.split(":").first
+      base_directory= Pathname.new(caller_path).dirname
+      absolute_file= "#{base_directory}/#{args.first}"
+
+      return_value= require(absolute_file)
+
+      puts "require(#{absolute_file}): returned #{return_value}"
       return_value
     end
 
