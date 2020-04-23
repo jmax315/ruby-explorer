@@ -8,6 +8,9 @@ class Probe
     end
 
     wrap(Kernel, :require_relative) do |original_require_relative, args|
+      # DEBUG
+      puts caller
+
       puts "require_relative(#{args})"
       return_value= original_require_relative.call(*args)
       puts "require_relative(#{args}): returned #{return_value}"
