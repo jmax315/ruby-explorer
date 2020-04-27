@@ -8,15 +8,9 @@ class Probe
     end
 
     wrap(Kernel, :require_relative) do |original_require_relative, args|
-      puts "require_relative(#{args})"
-
-      caller_path= caller(2,1).first.split(":").first
-      base_directory= Pathname.new(caller_path).dirname
-      absolute_file= "#{base_directory}/#{args.first}"
-
+      absolute_file= "#{caller_directory}/#{args.first}"
       return_value= require(absolute_file)
-
-      puts "require(#{absolute_file}): returned #{return_value}"
+      puts "require(#{absolute_file}): loaded #{absolute_file}"
       return_value
     end
 
@@ -40,5 +34,9 @@ class Probe
     klass.singleton_class.define_method(method_id) do |*args|
       yield(original_method, args)
     end
+  end
+
+  def caller_directory
+    Pathname.new(caller(3,1).first.split(":").first).dirname.to_s
   end
 end

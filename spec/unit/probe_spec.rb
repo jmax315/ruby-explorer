@@ -155,4 +155,18 @@ describe "Probe" do
       expect(wrap_target.a_module_method("")).to eq("a_module_method expected return value")
     end
   end
+
+  describe "caller_directory" do
+    def original_caller
+      second_caller
+    end
+
+    def second_caller
+      the_probe.caller_directory
+    end
+
+    it "returns the directory of the third back caller" do
+      expect(original_caller).to eq(Pathname.new(__FILE__).dirname.to_s)
+    end
+  end
 end
