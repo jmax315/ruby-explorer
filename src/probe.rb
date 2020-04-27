@@ -1,16 +1,16 @@
+require "pathname"
+
 class Probe
   def install
     wrap(Kernel, :require) do |original_require, args|
-      puts "require(#{args})"
       return_value= original_require.call(*args)
-      puts "require(#{args}): returned #{return_value}"
+      puts "require(#{args.first}): #{require_message(return_value, required_file(args.first, $LOADED_FEATURES))}"
       return_value
     end
 
     wrap(Kernel, :require_relative) do |original_require_relative, args|
-      absolute_file= "#{caller_directory}/#{args.first}"
-      return_value= require(absolute_file)
-      puts "require(#{absolute_file}): loaded #{absolute_file}"
+      return_value= require("#{caller_directory}/#{args.first}")
+      puts "require_relative(#{args.first}): #{require_message(return_value, required_file(args.first, $LOADED_FEATURES))}"
       return_value
     end
 
@@ -38,5 +38,31 @@ class Probe
 
   def caller_directory
     Pathname.new(caller(3,1).first.split(":").first).dirname.to_s
+  end
+
+  def require_message(loaded, filename)
+    if !loaded
+      "already loaded"
+    elsif filename
+      "loaded #{filename}"
+    else
+      "couldn't find loaded file"
+    end
+  end
+
+  def required_file(file, loaded_features)
+    base_file= Pathname.new(file).basename.to_s
+
+    if base_file =~ /.*(\.rb|\.so)$/
+      match_pattern= /.*\/#{base_file}$/
+    else
+      match_pattern= /.*\/#{base_file}(\.rb|\.so)$/
+    end
+
+    loaded_features.reverse_each do |loaded_file|
+      return loaded_file if loaded_file =~ match_pattern
+    end
+
+    nil
   end
 end

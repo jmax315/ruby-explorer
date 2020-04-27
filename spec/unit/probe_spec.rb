@@ -169,4 +169,55 @@ describe "Probe" do
       expect(original_caller).to eq(Pathname.new(__FILE__).dirname.to_s)
     end
   end
+
+  describe "required_file" do
+    it "doesn't find a file that hasn't been loaded" do
+      expect(the_probe.required_file("a-file", [])).to be_nil
+    end
+
+    it "finds a loaded file with no path and no extension when the loaded file has a .rb extension" do
+      expect(the_probe.required_file("a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
+        to eq("/some/path/a-file.rb")
+    end
+
+    it "finds a loaded file with no path and no extension when the loaded file has a .so extension" do
+      expect(the_probe.required_file("a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
+        to eq("/some/path/a-file.so")
+    end
+
+    it "finds a loaded file with no path and an .rb extension when the loaded file has a .rb extension" do
+      expect(the_probe.required_file("a-file.rb", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
+        to eq("/some/path/a-file.rb")
+    end
+
+    it "finds a loaded file with no path and an .so extension when the loaded file has a .so extension" do
+      expect(the_probe.required_file("a-file.so", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
+        to eq("/some/path/a-file.so")
+    end
+
+    it "finds a loaded file with a path and no extension when the loaded file has a .rb extension" do
+      expect(the_probe.required_file("../a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
+        to eq("/some/path/a-file.rb")
+    end
+
+    it "finds a loaded file with a path and no extension when the loaded file has a .so extension" do
+      expect(the_probe.required_file("../a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
+        to eq("/some/path/a-file.so")
+    end
+
+    it "finds a loaded file with a path and an .rb extension when the loaded file has a .rb extension" do
+      expect(the_probe.required_file("../a-file.rb", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
+        to eq("/some/path/a-file.rb")
+    end
+
+    it "finds a loaded file with a path and an .so extension when the loaded file has a .so extension" do
+      expect(the_probe.required_file("../a-file.so", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
+        to eq("/some/path/a-file.so")
+    end
+
+    it "finds the last file loaded" do
+      expect(the_probe.required_file("a-file", ["/some/path/a-file.rb", "/some/other/path/a-file.rb"])).
+        to eq("/some/other/path/a-file.rb")
+    end
+  end
 end
