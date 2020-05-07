@@ -156,7 +156,7 @@ describe "Probe" do
     end
   end
 
-  describe "caller_directory" do
+  describe "#caller_directory" do
     def original_caller
       second_caller
     end
@@ -170,54 +170,80 @@ describe "Probe" do
     end
   end
 
-  describe "required_file" do
+  describe "#require_file" do
     it "doesn't find a file that hasn't been loaded" do
-      expect(the_probe.required_file("a-file", [])).to be_nil
+      expect(the_probe.require_file("a-file", [])).to be_nil
     end
 
     it "finds a loaded file with no path and no extension when the loaded file has a .rb extension" do
-      expect(the_probe.required_file("a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
+      expect(the_probe.require_file("a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
         to eq("/some/path/a-file.rb")
     end
 
     it "finds a loaded file with no path and no extension when the loaded file has a .so extension" do
-      expect(the_probe.required_file("a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
+      expect(the_probe.require_file("a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
         to eq("/some/path/a-file.so")
     end
 
     it "finds a loaded file with no path and an .rb extension when the loaded file has a .rb extension" do
-      expect(the_probe.required_file("a-file.rb", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
+      expect(the_probe.require_file("a-file.rb", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
         to eq("/some/path/a-file.rb")
     end
 
     it "finds a loaded file with no path and an .so extension when the loaded file has a .so extension" do
-      expect(the_probe.required_file("a-file.so", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
+      expect(the_probe.require_file("a-file.so", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
         to eq("/some/path/a-file.so")
     end
 
     it "finds a loaded file with a path and no extension when the loaded file has a .rb extension" do
-      expect(the_probe.required_file("../a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
+      expect(the_probe.require_file("../a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
         to eq("/some/path/a-file.rb")
     end
 
     it "finds a loaded file with a path and no extension when the loaded file has a .so extension" do
-      expect(the_probe.required_file("../a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
+      expect(the_probe.require_file("../a-file", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
         to eq("/some/path/a-file.so")
     end
 
     it "finds a loaded file with a path and an .rb extension when the loaded file has a .rb extension" do
-      expect(the_probe.required_file("../a-file.rb", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
+      expect(the_probe.require_file("../a-file.rb", ["/some/path/wrong-file.rb", "/some/path/a-file.rb"])).
         to eq("/some/path/a-file.rb")
     end
 
     it "finds a loaded file with a path and an .so extension when the loaded file has a .so extension" do
-      expect(the_probe.required_file("../a-file.so", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
+      expect(the_probe.require_file("../a-file.so", ["/some/path/wrong-file.rb", "/some/path/a-file.so"])).
         to eq("/some/path/a-file.so")
     end
 
     it "finds the last file loaded" do
-      expect(the_probe.required_file("a-file", ["/some/path/a-file.rb", "/some/other/path/a-file.rb"])).
+      expect(the_probe.require_file("a-file", ["/some/path/a-file.rb", "/some/other/path/a-file.rb"])).
         to eq("/some/other/path/a-file.rb")
+    end
+  end
+
+  describe "#load_file" do
+    before do
+      FileUtils.mkdir_p "subdir"
+      File.open("subdir/a-file.rb", "w") {|f| f.puts("'junk'")}
+    end
+
+    after do
+      FileUtils.rm_rf "subdir"
+    end
+
+    it "finds the file when the filename is a non-absolute path" do
+      expect(the_probe.load_file("subdir/a-file.rb", [])).
+        to eq("#{Dir.pwd}/subdir/a-file.rb")
+    end
+
+    it "finds the file on the $LOAD_PATH from a non-absolute path" do
+      expect(the_probe.load_file("a-file.rb", ["#{Dir.pwd}/subdir"])).
+        to eq("#{Dir.pwd}/subdir/a-file.rb")
+    end
+
+    it "finds the file from an absolute path" do
+      expect(the_probe.load_file("#{Dir.pwd}/subdir/a-file.rb", [])).
+        to eq("#{Dir.pwd}/subdir/a-file.rb")
     end
   end
 end
